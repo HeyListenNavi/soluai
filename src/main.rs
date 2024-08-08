@@ -1,6 +1,7 @@
 use actix_cors::Cors;
 use actix_web::{web::{self, scope}, App, HttpServer};
 mod services;
+mod yolo;
 use services::index;
 
 #[actix_web::main]

@@ -1803,6 +1803,7 @@ dependencies = [
  "actix-cors",
  "actix-web",
  "actix-web-actors",
+ "bytes",
  "image",
  "ndarray",
  "ort",
