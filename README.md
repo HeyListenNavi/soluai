@@ -1,7 +1,8 @@
 <div align="center">
   <a href="https://github.com/HeyListenNavi/soluai">
-    <img src="https://github.com/user-attachments/assets/759b32a5-4d22-4899-bee3-da15366d8dca" alt="SoluAI logo" width="350" height="350">
+    <img src="https://github.com/user-attachments/assets/2da400d5-a016-48da-aa26-4e97cebdc2ae" alt="SoluAI logo" width="350" height="350">
   </a>
+
 
 <h1>SoluAI</h1>
 <p>A video surveillance web application that detects various instances of relevance through the use of a machine learning model</p>
