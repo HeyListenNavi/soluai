@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>SoluAI</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    </head>
+    <body>
+        <nav class="navbar">
+            <ul>
+                <li>
+                    <button class="button--home">
+                        <span class="material-symbols-rounded">home</span>
+                        <span class="text">Inicio</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="button--capturing">
+                        <span class="material-symbols-rounded">photo_library</span>
+                        <span class="text">Capturas</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="button--cameras">
+                        <span class="material-symbols-rounded">photo_camera</span>
+                        <span class="text">Cámaras</span>
+                    </button>
+                </li>
+                <li>
+                    <button class="button--configuration">
+                        <span class="material-symbols-rounded">settings</span>
+                        <span class="text">Configuración</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+        <div class="main">
+            <header class="header">
+                <h1>SICA</h1>
+            </header>
+            <div class="cameras">
+                <div class="camera">
+                    <video class="video" id="webcam" width="640" height="480"></video>
+                    <canvas class="canvas" id="canvas" width="640" height="480"></canvas>
+                </div>
+            </div>
+            <div class="buttons">
+                <button class="start">Comenzar</button>
+                <button class="stop">Detener</button>
+            </div>
+        </div>
+        <script>
+            const video = document.getElementById("webcam");
+            const canvas = document.getElementById("canvas");
+            const canvas_ctx = canvas.getContext("2d");
+
+            // Create WebSocket connection
+            socket = new WebSocket("ws://127.0.0.1:8000/api/predict");
+            socket.binaryType = "arraybuffer"
+            socket.onclose = () => {
+                socket = null;
+                console.log("Connection is closed");
+            };
+            socket.onerror = (e) => {console.log(e.msg);}
+
+            socket.onopen = (event) => {
+                console.log("Connection opened");
+                // Access the webcam
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then((stream) => {
+                        video.srcObject = stream;
+                        video.play();
+
+                        video.addEventListener('canplay', () => {
+                            capture_and_send_frame();
+                            setInterval(capture_and_send_frame, 10000);
+                        }, { once: true });
+                    })
+                    .catch((err) => {
+                        console.error("Error accessing the webcam: " + err);
+                    });
+                
+            };
+
+            socket.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                console.log(msg);
+                draw_boxes(msg);
+            }
+
+            function get_video_frame(video_element) {
+                const frame_canvas = document.createElement("canvas");
+                frame_canvas.width = video_element.videoWidth;
+                frame_canvas.height = video_element.videoHeight;
+                var frame_canvas_ctx = frame_canvas.getContext("2d");
+                frame_canvas_ctx.drawImage(video_element, 0, 0, frame_canvas.width, frame_canvas.height);
+                return frame_canvas;
+            }
+
+            function capture_and_send_frame() {
+                const frame_canvas = get_video_frame(video);
+                frame_canvas.toBlob((blob) => {
+                    if (blob) {
+                        blob.arrayBuffer().then((array_buffer) => {
+                            console.log("Sending frame: ");
+                            console.log(array_buffer);
+                            socket.send(array_buffer);
+                        }).catch((error) => {
+                            console.error("Error converting blob to arrayBuffer:", error);
+                        });
+                    } else {
+                        console.error("Failed to capture frame as blob");
+                    }
+                }, "image/jpeg", 0.75);
+            }
+
+            function draw_boxes(inferences) {
+                canvas_ctx.clearRect(0, 0, canvas.width, canvas.height);
+                canvas_ctx.strokeStyle = "#00FF00";
+                canvas_ctx.lineWidth = 3;
+                canvas_ctx.font = "18px serif";
+                inferences.forEach((box) => {
+                    const x1 = box.bounding_box.x1;
+                    const y1 = box.bounding_box.y1;
+                    const x2 = box.bounding_box.x2;
+                    const y2 = box.bounding_box.y2;
+                    canvas_ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                    canvas_ctx.fillStyle = "#00ff00";
+                    const label = box.object + ": " + box.probability;
+                    const width = canvas_ctx.measureText(label).width;
+                    canvas_ctx.fillRect(x1, y1, width + 10, 25);
+                    canvas_ctx.fillStyle = "#000000";
+                    canvas_ctx.fillText(label, x1, y1 + 18);
+                });
+            }
+        </script>
+    </body>
+</html>
