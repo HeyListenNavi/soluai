@@ -1,37 +1,45 @@
 use actix::{Actor, StreamHandler};
-use actix_web::{web::Payload, Error, HttpRequest, HttpResponse};
-use actix_web_actors::ws;
+use actix_web::{web::Payload, get, rt, Error, HttpRequest, HttpResponse, Responder};
+use actix_ws::Message;
+use futures_util::StreamExt as _;
+use serde_json;
 use crate::yolo::run_model;
 
-struct PredictWebsocketActor;
-
-impl Actor for PredictWebsocketActor {
-    type Context = ws::WebsocketContext<Self>;
-}
-
-impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for PredictWebsocketActor {
-    fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
-        match msg {
-            Ok(ws::Message::Binary(bin)) => {
-                let now = std::time::Instant::now();
-                match run_model(bin.clone()) {
-                    Ok(inferences) => println!("{:?}", inferences),
-                    Err(e) => println!("{:?}", e)
+pub async fn prediction_websocket(req: HttpRequest, body: Payload) -> actix_web::Result<impl Responder> {
+    let (response, mut session, mut msg_stream) = actix_ws::handle(&req, body)?;
+    let mut stream = msg_stream.max_frame_size(102400);
+    rt::spawn(async move {
+        while let Some(msg) = stream.next().await {
+            match msg {
+                Ok(Message::Binary(bin)) => {
+                    let now = std::time::Instant::now();
+                    println!("Data recieved");
+                    match run_model(bin.clone()) {
+                        Ok(inferences) => {
+                            println!("{:?}", &inferences);
+                            let response = serde_json::to_string(&inferences).unwrap();
+                            session.text(response.as_str()).await.unwrap_or_else(|e| {
+                                println!("Error: {:?}", e);
+                            });
+                        },
+                        Err(e) => println!("{:?}", e)
+                    }
+                    let elapsed = now.elapsed();
+                    println!("Duration: {:.2?}", elapsed);
                 }
-                let elapsed = now.elapsed();
-                println!("Duration: {:.2?}", elapsed);
+                Err(e) => {
+                    println!("{:?}", e);
+                    break;
+                }
+                _ => {
+                    println!("Unrecognized message type");
+                    break;
+                }
             }
-            Ok(ws::Message::Close(reason)) => {
-                println!("Connection closed: {:?}", reason);
-                ctx.close(reason);
-            }
-            _ => (),
         }
-    }
-}
 
-pub async fn index(req: HttpRequest, stream: Payload) -> Result<HttpResponse, Error> {
-    let resp = ws::start(PredictWebsocketActor {}, &req, stream);
-    println!("{:?}", resp);
-    resp
+        let _ = session.close(None).await;
+    });
+
+    Ok(response)
 }

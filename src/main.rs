@@ -2,7 +2,7 @@ use actix_cors::Cors;
 use actix_web::{web::{self, scope}, App, HttpServer};
 mod services;
 mod yolo;
-use services::index;
+use services::prediction_websocket;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -21,12 +21,13 @@ async fn main() -> std::io::Result<()> {
             .allowed_origin_fn(|origin, _req_head| {
                 origin.as_bytes().starts_with(b"ws://127.0.0.1")
             })
+            .allow_any_origin()
             .allowed_methods(vec!["GET", "POST"]);
         App::new()
             .wrap(cors)
             .service(
                 scope("/api")
-                    .route("predict/", web::get().to(index))
+                .route("/predict", web::get().to(prediction_websocket))
             )
     })
     .bind(address.clone())?

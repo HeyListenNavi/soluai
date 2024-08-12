@@ -3,8 +3,9 @@ use bytes::Bytes;
 use image::{imageops::FilterType, DynamicImage, GenericImageView, ImageReader};
 use ndarray::{s, Array, Axis, Ix4,};
 use ort::{inputs, Session, SessionOutputs};
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct BoundingBox {
     x1: f32,
     y1: f32,
@@ -12,7 +13,7 @@ pub struct BoundingBox {
     y2: f32
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Inference {
     bounding_box: BoundingBox,
     object: String,
