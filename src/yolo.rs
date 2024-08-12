@@ -30,7 +30,7 @@ const YOLOV8_CLASS_LABELS: [&str; 3] = [
 static SESSION: LazyLock<Arc<Session>> = LazyLock::new(|| {
     let session = Session::builder()
         .expect("Failed to load Session")
-        .commit_from_file("data/gun_detection_model.onnx")
+        .commit_from_file("data/model.onnx")
         .expect("Failed to load ONNX model");
     Arc::new(session)
 });
