@@ -9,13 +9,24 @@
 </div>
 
 ### Usage
-To run the server `Rust` and `Cargo` are needed. The model isn't included in this repository so you'll have to get your own model and store it as data/model.onnx
-When the prerequisites have been installed the project can be ran with the following command:
+To run the application `Rust`, `Cargo`, and `Trunk` are needed. The model isn't included in this repository so you'll have to get your own model and store it in server/data/model.onnx
+When the prerequisites have been installed the project can be used with the following commands:
+
+#### Server
 ```
-cargo run
+cargo run --bin server
 ```
 The server can be also compiled with the following command:
 ```
-cargo build --release
+cargo build --bin server --release
 ```
-There's an index.html file that can be used to test the project
+If you don't want to run the client there's an html file that can be used to test the server in server/index.html
+
+####  Client
+```
+trunk --config client/Trunk.toml serve
+```
+The client can be built into client/dist with the following command:
+```
+trunk --config client/Trunk.toml build --release
+```
