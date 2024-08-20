@@ -35,9 +35,7 @@ web-sys = { version = "0.3.69", features = [
     "CssStyleDeclaration",
     "HtmlElement",
     "CanvasRenderingContext2d",
-    "ImageData",
-    "Blob",
-    "BinaryType"
+    "MediaStreamTrack"
 ]}
 yew = { version = "0.21.0", features = ["csr"] }
 yew-router = "0.18.0"

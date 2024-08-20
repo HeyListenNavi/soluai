@@ -29,14 +29,14 @@ const YOLOV8_CLASS_LABELS: [&str; 3] = [
 
 static SESSION: LazyLock<Arc<Session>> = LazyLock::new(|| {
     let session = Session::builder()
-        .expect("Failed to load Session")
+        .expect("ERROR - Failed to load Session")
         .with_execution_providers([
             CUDAExecutionProvider::default().build(),
             OpenVINOExecutionProvider::default().build()
         ])
-        .expect("Failed to load Execution Provider")
+        .expect("ERROR - Failed to load Execution Provider")
         .commit_from_file("data/model.onnx")
-        .expect("Failed to load ONNX model");
+        .expect("ERROR - Failed to load ONNX model");
     Arc::new(session)
 });
 
@@ -71,7 +71,7 @@ fn model_output_post_processing(outputs: SessionOutputs, original_image_width: u
     let extracted_tensor = match outputs["output0"].try_extract_tensor::<f32>() {
         Ok(tensor) => tensor.t().into_owned(),
         Err(e) => {
-            println!("Couldn't extract output into tensor: {:?}", e);
+            println!("ERROR - Couldn't extract output into tensor: {:?}", e);
             return Err(e.into());
         }
     };
@@ -144,9 +144,9 @@ pub fn run_model(image_data: Bytes) -> Result<Vec<Inference>, Box<dyn Error>> {
     // ----------------------------
 
     let original_image = match ImageReader::new(Cursor::new(image_data)).with_guessed_format() {
-        Ok(image) => image.decode().expect("Format not suported"),
+        Ok(image) => image.decode().expect("ERROR - Format not suported"),
         Err(e) => {
-            println!("Error opening image: {:?}", e);
+            println!("ERROR - Couldn't open image: {:?}", e);
             return Err(e.into());
         }
     };
@@ -160,7 +160,7 @@ pub fn run_model(image_data: Bytes) -> Result<Vec<Inference>, Box<dyn Error>> {
     let input_values = match inputs![model_input] {
         Ok(values) => values,
         Err(e) => {
-            println!("Error converting image Array into Session Input Values: {:?}", e);
+            println!("ERROR - Couldn't convert image array into Session Input Values: {:?}", e);
             return Err(e.into());
         }
     };
@@ -170,7 +170,7 @@ pub fn run_model(image_data: Bytes) -> Result<Vec<Inference>, Box<dyn Error>> {
     let outputs = match session.run(input_values) {
         Ok(output) => output,
         Err(e) => {
-            println!("Error running session: {:?}", e);
+            println!("ERROR - Couldn't run session: {:?}", e);
             return Err(e.into());
         }
     };
@@ -182,7 +182,7 @@ pub fn run_model(image_data: Bytes) -> Result<Vec<Inference>, Box<dyn Error>> {
     let inferences = match model_output_post_processing(outputs, image_width, image_height) {
         Ok(inferences) => inferences,
         Err(e) => {
-            println!("Error post-processing Session Outputs: {:?}", e);
+            println!("ERROR - Post-processing Session Outputs failed: {:?}", e);
             return Err(e.into());
         }
     };

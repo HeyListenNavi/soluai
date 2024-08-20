@@ -12,6 +12,7 @@ async fn main() -> std::io::Result<()> {
     };
 
     let address = format!("0.0.0.0:{port}");
+    println!("INFO - Server started on address: {}", &address);
 
     HttpServer::new(|| {
         let cors = Cors::default()
