@@ -7,7 +7,7 @@ use wasm_bindgen_futures::{JsFuture, spawn_local};
 use js_sys::Array;
 
 const SERVER_URL: &str = "ws://127.0.0.1:8000/api/predict";
-const INTERVAL_MS: u32 = 5000;
+const INTERVAL_MS: u32 = 2500;
 
 #[wasm_bindgen(module = "/assets/websockets.js")]
 extern "C" {
@@ -110,6 +110,15 @@ impl Component for CameraFrame {
                     })
                 }
 
+                let box_canvas_list = document().query_selector_all("canvas#canvas").unwrap_throw();
+                let cameras = (0..box_canvas_list.length()).map(|i| {
+                    box_canvas_list.item(i).unwrap_throw().unchecked_into::<HtmlCanvasElement>()
+                });
+                for box_canvas  in cameras {
+                    box_canvas.set_width(640);
+                    box_canvas.set_height(480);
+                } 
+
                 // Start prediction interval
                 let interval_handle = {
                     let ctx_link = ctx.link().clone();
@@ -130,8 +139,6 @@ impl Component for CameraFrame {
 
                 // Process the frames of each camera
                 for (box_canvas, camera_element ) in cameras {
-                    box_canvas.set_width(camera_element.video_width());
-                    box_canvas.set_height(camera_element.video_height());
                     self.websocket_manager.send_frame_to_server(&JsValue::from(camera_element), &JsValue::from(box_canvas));
                 }               
                 return false;

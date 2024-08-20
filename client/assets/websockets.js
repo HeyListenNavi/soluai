@@ -55,7 +55,7 @@ export class WebSocketManager {
 
     draw_boxes(inferences, box_canvas) {
         const boxes_canvas_ctx = box_canvas.getContext("2d");
-
+        
         // Clear canvas and setup style
         boxes_canvas_ctx.clearRect(0, 0, box_canvas.width, box_canvas.height);
         boxes_canvas_ctx.lineWidth = 3;
