@@ -1,0 +1,43 @@
+[package]
+name = "client"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+futures = "0.3.30"
+gloo-file = "0.3.0"
+gloo-net = "0.6.0"
+gloo-timers = "0.3.0"
+gloo-utils = "0.2.0"
+js-sys = "0.3.70"
+serde = "1.0.206"
+serde_json = "1.0.124"
+wasm-bindgen = "0.2.93"
+wasm-bindgen-futures = "0.4.42"
+web-sys = { version = "0.3.69", features = [
+    "Window",
+    "Navigator",
+    "MediaDevices",
+    "MediaDeviceInfo",
+    "MediaDeviceKind",
+    "HtmlSelectElement",
+    "HtmlOptionElement",
+    "Node",
+    "NodeList",
+    "DocumentFragment",
+    "HtmlVideoElement",
+    "HtmlCanvasElement",
+    "MediaStreamConstraints",
+    "MediaTrackConstraints",
+    "MediaStream",
+    "Element",
+    "DomTokenList",
+    "CssStyleDeclaration",
+    "HtmlElement",
+    "CanvasRenderingContext2d",
+    "ImageData",
+    "Blob",
+    "BinaryType"
+]}
+yew = { version = "0.21.0", features = ["csr"] }
+yew-router = "0.18.0"

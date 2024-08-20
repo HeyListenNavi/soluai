@@ -1,2 +1,3 @@
-/target
+target/
 gun_detection_model.onnx
+dist/

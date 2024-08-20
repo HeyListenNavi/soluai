@@ -1,0 +1,275 @@
+/* General styles ヾ(•ω•`)o
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap')
+
+:root
+    --color-primary: #7522e6
+    --color-primary-top: #fff
+    --color-background-base: #f2f4f5
+    --color-background-white: #fff
+    --color-background-hover: #f1e8fd
+    --color-fg-dark: #363b46
+    --color-fg-light: #fff
+    --animation-duration: 200ms
+    --animation-duration--long: 400ms
+
+body.dark-mode
+    --color-primary: #7522e6
+    --color-primary-top: #fff
+    --color-background-base: #1e1e1e
+    --color-background-white: #23262b
+    --color-background-hover: #31313f
+    --color-fg-dark: #fff
+    --color-fg-light: #363b46
+
+html, body
+    padding: 0
+    margin: 0
+
+html
+    height: 100vh
+
+div
+    box-sizing: border-box
+
+body
+    height: 100%
+    font-family: 'Noto Sans'
+    color: var(--color-fg-dark)
+    font-style: normal
+    display: grid
+    grid-template-columns: 88px 1fr
+    grid-template-areas: "navbar content"
+    justify-items: center
+    align-items: center
+    transition: grid-template-columns var(--animation-duration--long)
+    background-color: var(--color-background-base)
+
+
+.navbar
+    height: 100%
+    width: 100%
+    margin: 0
+    grid-area: navbar
+    display: flex
+    background-color: var(--color-background-white)
+
+    img
+        width: 50px
+
+    ul
+        box-sizing: border-box
+        list-style-type: none
+        padding: 1rem
+        display: flex
+        flex-flow: column
+        flex-wrap: wrap
+        gap: 0.5rem
+        justify-content: center
+        align-items: center
+
+        ion-icon
+            font-size: 24px
+            min-width: 24px
+            min-height: 24px
+
+        .logo, .user
+            .content
+                flex: 0 0 55px
+                width: 55px
+                display: flex
+                justify-content: center
+
+        .logo
+            margin-bottom: 2rem
+        
+        .user
+            margin-top: 2rem
+            padding: 0
+            
+            h1, p
+                margin: 0
+
+            h1
+                font-size: 1rem
+                text-align: left
+            
+            p
+                font-size: 0.5rem
+                font-weight: normal
+
+            img
+                width: 35px
+                border-radius: 50%
+
+            button
+                padding: 1rem 0
+                min-height: 70px
+
+        button
+            overflow: hidden
+            border-radius: 15px
+            display: flex
+            align-items: center
+            padding: 1rem
+            transition: padding-left var(--animation-duration), background-color var(--animation-duration)
+            background-color: var(--color-background-white)
+            color: var(--color-fg-dark)
+            justify-content: flex-start
+
+            &:hover
+                transform: none !important
+                
+                &:not(.active)
+                    padding-left: 2rem
+                    background-color: var(--color-background-hover)
+
+            &.notifications
+                .text
+                    width: 100%
+                    display: flex
+                    justify-content: space-between
+
+                .number
+                    background-color: var(--color-primary)
+                    color: var(--color-primary-top)
+                    border-radius: 5px
+                    padding: 1px 5px
+                    font-size: 8px
+
+                ion-icon::before
+                    content: ""
+                    display: block
+                    position: absolute
+                    top: 3px
+                    right: 2px
+                    width: 6px
+                    height: 6px
+                    border-radius: 50%
+                    background-color: var(--color-primary)
+                    border: 1px solid var(--color-background-white)
+            
+        .active
+            background-color: var(--color-primary)
+            color: var(--color-primary-top)
+
+            &.notifications .text .number
+                background-color: var(--color-background-white)
+                color: var(--color-fg-dark)
+
+            &.notifications ion-icon::before
+                border: 1px solid var(--color-primary-top)
+
+        .text
+            transition: transform var(--animation-duration--long)
+            transform: translateX(200px)
+            visibility: hidden
+            white-space: nowrap
+
+    li, ul
+        width: 100% 
+   
+:has(.navbar:hover)
+    grid-template-columns: 300px 1fr
+    
+    button
+        justify-content: left
+
+:is(.navbar:hover)
+    .text
+        transform: translateX(0px)
+        visibility: visible
+ 
+.main
+    grid-area: content
+    height: 100%
+    width: 100%
+
+button
+    width: 100%
+    background-color: var(--color-primary)
+    color: var(--color-primary-top)
+    padding: 1rem
+    border: none
+    border-radius: 2rem
+    font-family: 'Noto Sans'
+    font-weight: 600
+    column-gap: 5px
+    transition: transform var(--animation-duration)
+
+    &:disabled
+        background-color: var(--color-background-hover)
+        color: var(--color-fg-dark)
+
+    &:hover:not(&:disabled)
+        transform: scale(0.9)
+        cursor: pointer
+
+    &:disabled:hover
+        transform: none
+        cursor: not-allowed
+
+h1
+    margin: 1rem 0
+
+/* Page specific styles －O－
+
+.main
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
+    gap: 1rem
+    
+    .camera-frame
+        width: 90%
+
+        .cameras
+            display: flex
+            flex-direction: row
+            flex-wrap: wrap
+            justify-content: center
+            gap: 1rem
+
+            .camera
+                flex: 0 1 640px
+                display: flex
+                flex-direction: column
+                gap: 1rem
+
+                .frame
+                    position: relative
+                    display: flex
+                    justify-content: center
+                    align-items: center
+                    
+                    .canvas, .video
+                        width: 100%
+
+                    .canvas
+                        position: absolute
+                        z-index: 10
+
+                    .video
+                        background-color: var(--color-background-white)
+
+                div[class^="source"]
+                    display: flex
+                    align-items: center
+                    gap: 5px
+
+    .buttons
+        padding: 2rem
+        
+        .amount button
+            min-width: 75px
+
+        div
+            padding: 0.5rem
+            display: flex
+            flex-direction: row
+            align-items: center
+            justify-content: center
+            gap: 1rem
+
+            button
+                flex: 0 0 fit-content

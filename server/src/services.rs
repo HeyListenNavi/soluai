@@ -1,4 +1,3 @@
-use actix::{Actor, StreamHandler};
 use actix_web::{web::Payload, get, rt, Error, HttpRequest, HttpResponse, Responder};
 use actix_ws::Message;
 use futures_util::StreamExt as _;
@@ -7,7 +6,7 @@ use crate::yolo::run_model;
 
 pub async fn prediction_websocket(req: HttpRequest, body: Payload) -> actix_web::Result<impl Responder> {
     let (response, mut session, mut msg_stream) = actix_ws::handle(&req, body)?;
-    let mut stream = msg_stream.max_frame_size(102400);
+    let mut stream = msg_stream.max_frame_size(921600);
     rt::spawn(async move {
         while let Some(msg) = stream.next().await {
             match msg {
@@ -27,8 +26,11 @@ pub async fn prediction_websocket(req: HttpRequest, body: Payload) -> actix_web:
                     let elapsed = now.elapsed();
                     println!("Duration: {:.2?}", elapsed);
                 }
+                Ok(Message::Text(text)) => {
+                    println!("Text: {text}");
+                }
                 Err(e) => {
-                    println!("{:?}", e);
+                    println!("Protocol error: {:?}", e);
                     break;
                 }
                 _ => {

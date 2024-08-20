@@ -16,10 +16,10 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         let cors = Cors::default()
             .allowed_origin_fn(|origin, _req_head| {
-                origin.as_bytes().starts_with(b"ws://localhost")
+                origin.as_bytes().starts_with(b"http//localhost")
             })
             .allowed_origin_fn(|origin, _req_head| {
-                origin.as_bytes().starts_with(b"ws://127.0.0.1")
+                origin.as_bytes().starts_with(b"http//127.0.0.1")
             })
             .allow_any_origin()
             .allowed_methods(vec!["GET", "POST"]);
