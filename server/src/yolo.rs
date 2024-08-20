@@ -2,7 +2,7 @@ use std::{error::Error, io::Cursor, sync::{Arc, LazyLock}};
 use bytes::Bytes;
 use image::{imageops::FilterType, DynamicImage, GenericImageView, ImageReader};
 use ndarray::{s, Array, Axis, Ix4,};
-use ort::{inputs, Session, SessionOutputs};
+use ort::{inputs, CUDAExecutionProvider, OpenVINOExecutionProvider, Session, SessionOutputs};
 use serde::{Serialize, Deserialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
@@ -30,6 +30,11 @@ const YOLOV8_CLASS_LABELS: [&str; 3] = [
 static SESSION: LazyLock<Arc<Session>> = LazyLock::new(|| {
     let session = Session::builder()
         .expect("Failed to load Session")
+        .with_execution_providers([
+            CUDAExecutionProvider::default().build(),
+            OpenVINOExecutionProvider::default().build()
+        ])
+        .expect("Failed to load Execution Provider")
         .commit_from_file("data/model.onnx")
         .expect("Failed to load ONNX model");
     Arc::new(session)
