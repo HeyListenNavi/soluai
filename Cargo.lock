@@ -2367,6 +2367,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "server"
+version = "0.1.0"
+dependencies = [
+ "actix",
+ "actix-cors",
+ "actix-web",
+ "actix-ws",
+ "bytes",
+ "futures-util",
+ "image",
+ "ndarray",
+ "ort",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "sha1"
 version = "0.10.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2446,23 +2463,6 @@ dependencies = [
  "byteorder",
  "libc",
  "winapi",
-]
-
-[[package]]
-name = "soluai"
-version = "0.1.0"
-dependencies = [
- "actix",
- "actix-cors",
- "actix-web",
- "actix-ws",
- "bytes",
- "futures-util",
- "image",
- "ndarray",
- "ort",
- "serde",
- "serde_json",
 ]
 
 [[package]]
