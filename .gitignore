@@ -1,3 +1,5 @@
 target/
-gun_detection_model.onnx
+*.onnx
 dist/
+*.pt
+__pycache__
