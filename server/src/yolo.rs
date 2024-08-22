@@ -136,6 +136,7 @@ fn model_output_post_processing(outputs: SessionOutputs, original_image_width: u
 }
 
 pub fn run_model(image_data: Bytes) -> Result<Vec<Inference>, Box<dyn Error>> {
+    let dylib_path  = 
     ort::init()
         .commit()?;
 
