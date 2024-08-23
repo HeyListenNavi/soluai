@@ -9,16 +9,17 @@
 </div>
 
 ### Usage
-To run the application `Rust`, `Cargo`, and `Trunk` are needed. The model isn't included in this repository so you'll have to get your own model and store it in server/data/model.onnx
+To run the application `Rust`, `Cargo`, `Trunk`, and `Python` are needed. The model isn't included in this repository so you'll have to get your own model and store it in server/data/model.onnx
 When the prerequisites have been installed the project can be used with the following commands:
 
 #### Server
+Install dependencies
 ```
-cargo run --bin server
+pip install -r requirements.txt
 ```
-The server can be also compiled with the following command:
+To run the server use the following command:
 ```
-cargo build --bin server --release
+python main.py
 ```
 If you don't want to run the client there's an html file that can be used to test the server in server/index.html
 

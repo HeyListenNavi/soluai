@@ -26,7 +26,12 @@ class Object:
     def __init__(self, object_name):
         self.object_name = object_name
 
-model = YOLO("data/model.pt")
+try:
+    model = YOLO("data/model.pt").to("cuda")
+    print("Using CUDA")
+except:
+    model = YOLO("data/model.pt")
+    print("Using CPU")
 
 router = APIRouter()
 
@@ -64,11 +69,11 @@ async def predict(websocket: WebSocket):
             if results[0].__len__() > 0:
                 # Make a list of all results
                 predictions = []
-                
+
                 for result in results:
                     boxes = result.boxes.cpu().numpy()
                     for box in boxes:
-                        
+
                         # Create a response based on the prediction response model
                         coordinates = box.xyxy[0].tolist()
                         inferenced_object = box.cls[0].tolist()
@@ -76,12 +81,12 @@ async def predict(websocket: WebSocket):
                         inferenced_object = model.names[inferenced_object].upper()
                         box = BoundingBox(x1=coordinates[0], y1=coordinates[1], x2=coordinates[2], y2=coordinates[3])
                         prediction = Inference(bounding_box=box, object=inferenced_object, probability=probability)
-                        
+
                         predictions.append(prediction)
-                
+
                 # Serialize list of results to json
                 predictions_json = json.dumps([prediction.dict() for prediction in predictions])
-                
+
                 # Send message to client
                 await websocket.send_text(predictions_json)
     except WebSocketDisconnect:
