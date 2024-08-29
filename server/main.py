@@ -63,7 +63,7 @@ async def predict(websocket: WebSocket):
             data = await websocket.receive_bytes()
             # Make an inference
             source = Image.open(BytesIO(data))
-            results = model(source=source)
+            results = model.predict(source=source, conf=0.60)
 
             # Only send message if there's at least one result
             if results[0].__len__() > 0:

@@ -63,12 +63,8 @@ export class WebSocketManager {
 
         // Setup style
         boxes_canvas_ctx.lineWidth = 3;
-        boxes_canvas_ctx.font = "bold 10pt Noto Sans";
+        boxes_canvas_ctx.font = "bold 18pt Noto Sans";
         boxes_canvas_ctx.strokeStyle = "#ff0000";
-        boxes_canvas_ctx.shadowBlur = 10;
-        boxes_canvas_ctx.shadowColor = "#ff0000";
-        boxes_canvas_ctx.shadowOffsetX = 2;
-        boxes_canvas_ctx.shadowOffsetY = 2;
 
         inferences.forEach((box) => {
             // Draw box
@@ -80,20 +76,20 @@ export class WebSocketManager {
 
             // Draw label
             const probability = (box.probability * 100).toFixed(1);
-            const label = box.object + ": " + probability + "%";
+            const label = this.translate_label(box.object);
 
             boxes_canvas_ctx.fillStyle = "#ff0000";
             boxes_canvas_ctx.fillText(label, x1, y1 - 8);
         });
     }
 
-    translate_label(label) {
+    translate_label(label) {        
         const labelMap = {
             "handgun": "Pistola",
             "knife": "Cuchillo",
             "long weapon": "Arma larga"
         };
 
-        return labelMap[label] || "Objeto desconocido"; // Fallback in case the weapon doesn't match
+        return labelMap[label.toLowerCase()] || "Objeto desconocido"; // Fallback in case the weapon doesn't match
     }
 }
