@@ -40,14 +40,16 @@ export class WebSocketManager {
                     // Send array to server
                     this.socket.send(array_buffer);
 
-                    // Clear canvas
-                    const boxes_canvas_ctx = box_canvas.getContext("2d");
-                    boxes_canvas_ctx.clearRect(0, 0, box_canvas.width, box_canvas.height);
-
                     this.socket.addEventListener("message", (event) => {
-                        const inferences = JSON.parse(event.data);
-                        console.log(inferences);
-                        this.draw_boxes(inferences, box_canvas);
+                        // Clear canvas
+                        const boxes_canvas_ctx = box_canvas.getContext("2d");
+                        boxes_canvas_ctx.clearRect(0, 0, box_canvas.width, box_canvas.height);
+                        
+                        if (event.data != "No objects detected") {
+                            const inferences = JSON.parse(event.data);
+                            console.log(inferences);
+                            this.draw_boxes(inferences, box_canvas);
+                        }
                     }, { once: true });
                 }).catch((error) => {
                     console.error("Error converting blob to arrayBuffer:", error);

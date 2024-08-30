@@ -63,7 +63,7 @@ async def predict(websocket: WebSocket):
             data = await websocket.receive_bytes()
             # Make an inference
             source = Image.open(BytesIO(data))
-            results = model.predict(source=source, conf=0.60)
+            results = model.predict(source=source, conf=0.75)
 
             # Only send message if there's at least one result
             if results[0].__len__() > 0:
@@ -89,6 +89,8 @@ async def predict(websocket: WebSocket):
 
                 # Send message to client
                 await websocket.send_text(predictions_json)
+            else:
+                await websocket.send_text("No objects detected")
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
