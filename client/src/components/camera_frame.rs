@@ -7,7 +7,7 @@ use wasm_bindgen_futures::{JsFuture, spawn_local};
 use js_sys::Array;
 
 const SERVER_URL: &str = "ws://127.0.0.1:8000/api/predict";
-const INTERVAL_MS: u32 = 2500;
+const INTERVAL_MS: u32 = 100;
 
 #[wasm_bindgen(module = "/assets/websockets.js")]
 extern "C" {

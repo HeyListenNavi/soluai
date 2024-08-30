@@ -31,18 +31,25 @@ export class WebSocketManager {
         frame_canvas.height = video_camera.videoHeight;
         const frame_canvas_ctx = frame_canvas.getContext("2d");
         frame_canvas_ctx.drawImage(video_camera, 0, 0, frame_canvas.width, frame_canvas.height);
-        
-        // Convert frame to an ArrayBuffer and send it to the server 
+
+        // Convert frame to an ArrayBuffer and send it to the server
         frame_canvas.toBlob((blob) => {
             if (blob) {
                 blob.arrayBuffer().then((array_buffer) => {
                     console.log("Sending frame:", array_buffer);
                     // Send array to server
                     this.socket.send(array_buffer);
+
                     this.socket.addEventListener("message", (event) => {
-                        const inferences = JSON.parse(event.data);
-                        console.log(inferences);
-                        this.draw_boxes(inferences, box_canvas);
+                        // Clear canvas
+                        const boxes_canvas_ctx = box_canvas.getContext("2d");
+                        boxes_canvas_ctx.clearRect(0, 0, box_canvas.width, box_canvas.height);
+                        
+                        if (event.data != "No objects detected") {
+                            const inferences = JSON.parse(event.data);
+                            console.log(inferences);
+                            this.draw_boxes(inferences, box_canvas);
+                        }
                     }, { once: true });
                 }).catch((error) => {
                     console.error("Error converting blob to arrayBuffer:", error);
@@ -55,17 +62,12 @@ export class WebSocketManager {
 
     draw_boxes(inferences, box_canvas) {
         const boxes_canvas_ctx = box_canvas.getContext("2d");
-        
-        // Clear canvas and setup style
-        boxes_canvas_ctx.clearRect(0, 0, box_canvas.width, box_canvas.height);
+
+        // Setup style
         boxes_canvas_ctx.lineWidth = 3;
-        boxes_canvas_ctx.font = "bold 10pt Noto Sans";
+        boxes_canvas_ctx.font = "bold 18pt Noto Sans";
         boxes_canvas_ctx.strokeStyle = "#ff0000";
-        boxes_canvas_ctx.shadowBlur = 10; 
-        boxes_canvas_ctx.shadowColor = "#ff0000"; 
-        boxes_canvas_ctx.shadowOffsetX = 2; 
-        boxes_canvas_ctx.shadowOffsetY = 2;  
-        
+
         inferences.forEach((box) => {
             // Draw box
             const x1 = box.bounding_box.x1;
@@ -73,24 +75,23 @@ export class WebSocketManager {
             const x2 = box.bounding_box.x2;
             const y2 = box.bounding_box.y2;
             boxes_canvas_ctx.strokeRect(x1, y1, x2 - x1, y2 - y1, [5]);
-           
+
             // Draw label
             const probability = (box.probability * 100).toFixed(1);
-            const object = this.translate_label(box.object);
-            const label = object + ": " + probability + "%";
+            const label = this.translate_label(box.object);
 
             boxes_canvas_ctx.fillStyle = "#ff0000";
             boxes_canvas_ctx.fillText(label, x1, y1 - 8);
         });
     }
 
-    translate_label(label) {
+    translate_label(label) {        
         const labelMap = {
             "handgun": "Pistola",
             "knife": "Cuchillo",
             "long weapon": "Arma larga"
         };
-    
-        return labelMap[label] || "Objeto desconocido"; // Fallback in case the weapon doesn't match
+
+        return labelMap[label.toLowerCase()] || "Objeto desconocido"; // Fallback in case the weapon doesn't match
     }
 }
